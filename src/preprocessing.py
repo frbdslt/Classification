@@ -17,8 +17,6 @@ def PrepareData(df):
     if missing_cols:
         raise ValueError(f"Missing required CSV columns: {', '.join(missing_cols)}")
 
-    # Repeated rows can otherwise land in both the training and test sets.
-    # Only these columns affect this model, so remove duplicates using them.
     df = df.drop_duplicates(subset=required_cols)
 
     X = df[FeatureCols].to_numpy(dtype=np.float64)
