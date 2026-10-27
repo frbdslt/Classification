@@ -12,8 +12,22 @@ def PrepareData(df):
     ]
     TargetCol = "target"
 
+    required_cols = FeatureCols + [TargetCol]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Missing required CSV columns: {', '.join(missing_cols)}")
+
+    # Repeated rows can otherwise land in both the training and test sets.
+    # Only these columns affect this model, so remove duplicates using them.
+    df = df.drop_duplicates(subset=required_cols)
+
     X = df[FeatureCols].to_numpy(dtype=np.float64)
     y = df[TargetCol].to_numpy(dtype=np.float64).reshape(-1, 1)
+
+    if not np.isfinite(X).all() or not np.isfinite(y).all():
+        raise ValueError("Feature and target columns must contain only numeric values.")
+    if not np.isin(y, [0.0, 1.0]).all():
+        raise ValueError("The target column must contain only 0 and 1.")
 
     return X, y, FeatureCols
 def StandardizeFeatures(X):

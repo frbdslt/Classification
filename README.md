@@ -1,54 +1,62 @@
-Heart Disease Prediction
-A small Python project that predicts the presence of heart disease from patient clinical measurements. It implements a binary classification Perceptron completely from scratch with NumPy — no scikit-learn. The program reports custom evaluation metrics (accuracy, precision, recall, F1-score, and a confusion matrix), plots training errors and predictions, and includes a Matplotlib interface for entering a single patient's values and requesting a real-time prediction.
-Dataset
-The data comes from Kaggle's Heart Disease Dataset. It combines four databases (Cleveland, Hungary, Switzerland, and Long Beach V) and contains 1,025 patient records with 14 columns.
-The program expects a CSV with these columns:
-RoleDataset columnInput featurecp (chest pain type)Input featurethalach (maximum heart rate achieved)Input featureca (major vessels colored by fluoroscopy)Input featureoldpeak (ST depression induced by exercise)Input featureexang (exercise-induced angina)Input featurethal (thalassemia type)Prediction targettarget (1 = disease, 0 = healthy)
-Download the dataset from Kaggle and place its CSV at data/heart.csv. The filename must match exactly because main.py reads that path. Only the six features listed above are used; the remaining columns (age, sex, trestbps, chol, fbs, restecg, slope) are ignored to reduce noise and improve generalization on this simple linear model.
-Models and workflow
-The selected columns are converted to numeric NumPy arrays by PrepareData in src/preprocessing.py.
-The rows are shuffled using seed 42 and split into 80% training and 20% test data.
-Input features are standardized with z-scores using the training set's mean and standard deviation; those same values are applied to the test set and to interactive user input.
-A Perceptron is trained with Rosenblatt's learning rule, a learning rate of 0.01, and 100 epochs:
-A bias term is added to every sample through the bias trick (_add_bias).
-A step (threshold) activation function maps the weighted sum to a 0/1 class label.
-Weights are updated online after each misclassified sample: $w \leftarrow w + \eta,(y_i - \hat{y}i),x{b,i}$.
-The number of misclassifications per epoch is recorded for plotting.
-Performance is evaluated with metrics implemented from scratch — accuracy, precision, recall, F1-score, and a confusion matrix — on both the training and test sets.
-With the six selected features the model reaches roughly 77.6% test accuracy and 84.5% recall, which is preferable to the full 13-feature setup (about 75.1% accuracy) because recall matters most in a medical screening context. A Perceptron is a linear classifier, so these figures are not guaranteed to generalize to other datasets or splits.
-Requirements
-Python 3.10 or newer
-Packages listed in requirements.txt:
-numpy
-pandas
-matplotlib
+# Heart Disease Prediction
 
-No machine learning framework such as scikit-learn is used; the Perceptron and all evaluation metrics are implemented from scratch with NumPy.
-Installation and usage
-Clone or download this repository, ensure the dataset is at data/heart.csv, then run the following from the project directory:
+A small educational Python project that implements a binary Perceptron with NumPy, without a machine learning framework. It prints accuracy, precision, recall, F1-score, and a confusion matrix, plots training results, and provides a Matplotlib interface for trying one sample.
+
+This project is for learning and experimentation. Its output is not a medical diagnosis and should not be used to make health decisions.
+
+## Dataset
+
+The project reads `data/heart.csv`, which is included in this repository. It expects these columns:
+
+| Role | Column |
+| --- | --- |
+| Input feature | `cp` |
+| Input feature | `thalach` |
+| Input feature | `ca` |
+| Input feature | `oldpeak` |
+| Input feature | `exang` |
+| Input feature | `thal` |
+| Prediction target | `target` (0 or 1) |
+
+Other columns are ignored. Before splitting, the program removes repeated rows based on the six selected features and the target. This helps prevent identical examples from appearing in both the training and test sets. In the included file, that leaves 293 unique feature-and-target combinations from 1,025 rows. The split is shuffled with seed 42 and uses 80% for training and 20% for testing.
+
+The features are standardized using the training set's mean and standard deviation. The same values are used to standardize test examples and values entered in the interface. The Perceptron uses a learning rate of 0.01 and runs for up to 100 epochs.
+
+The dataset contains repeated examples, and this small project uses a single random split. Its scores should be treated as an example of how the code works, not as evidence of real-world medical performance. Scores can differ from older results because duplicate examples are now removed before splitting.
+
+## Requirements
+
+- Python 3.10 or newer
+- Packages in `requirements.txt`: NumPy, pandas, and Matplotlib
+
+## Installation and usage
+
+From the project directory, create and activate a virtual environment:
+
+```powershell
 python -m venv .venv
-
-Activate the environment:
-# Windows PowerShell
 .venv\Scripts\Activate.ps1
+```
 
-# macOS / Linux
-source .venv/bin/activate
+On macOS or Linux, activate it with `source .venv/bin/activate`.
 
-Install dependencies and start the program:
+Install dependencies and run the program:
+
+```bash
 python -m pip install -r requirements.txt
 python main.py
+```
 
-The program prints the model's bias and weights, then the training and test metrics with the confusion matrix. It opens Matplotlib windows showing the training error history, the test-set confusion matrix, and a comparison of actual versus predicted classes. Finally, a prediction window appears where you enter values for cp, thalach, ca, oldpeak, exang, and thal, then click Predict to see whether the patient is classified as at risk (1) or healthy (0).
-Project structure
-.
-├── main.py                  # Training, evaluation metrics, plots, and prediction UI
-├── requirements.txt         # Python dependencies
-├── data/
-│   └── heart.csv            # Kaggle dataset (place it here)
-└── src/
-    ├── preprocessing.py     # Feature selection, standardization, train/test split
-    └── classification.py    # Perceptron model implemented from scratch
+The program prints training and test metrics, then opens plots and the single-sample interface. The interface checks that entered values are numeric and within simple allowed ranges. It displays a model class output, which is not a diagnosis.
 
-Data attribution
-Please follow Kaggle's terms and the dataset creator's licensing and attribution requirements when using or redistributing the data. This project does not include a separate dataset license.
+## Project structure
+
+```text
+main.py                  Training, evaluation, plots, and prediction interface
+requirements.txt         Python dependencies
+data/heart.csv           Dataset
+src/preprocessing.py     Feature selection, validation, standardization, and split
+src/classification.py    Perceptron implemented from scratch
+```
+
+Please follow the dataset creator's license and attribution requirements when using or redistributing the data. This project does not include a separate dataset license.

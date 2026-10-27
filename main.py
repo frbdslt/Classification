@@ -125,7 +125,7 @@ def PrintResults(name, y_true, y_pred):
 
 def LaunchPredictionUI(model, feature_names, train_mean, train_std):
     fig = plt.figure(figsize=(8, 10))
-    fig.suptitle("Heart Disease Single Sample Prediction", fontsize=16)
+    fig.suptitle("Model Prediction for One Sample", fontsize=16)
 
     text_boxes = []
     default_values = {
@@ -154,7 +154,7 @@ def LaunchPredictionUI(model, feature_names, train_mean, train_std):
     result_text = result_ax.text(
         0.5,
         0.5,
-        "Enter feature values and click Predict",
+        "Educational model output, not a medical diagnosis",
         ha="center",
         va="center",
         fontsize=12,
@@ -168,21 +168,35 @@ def LaunchPredictionUI(model, feature_names, train_mean, train_std):
                 value = float(text_box.text.strip())
                 user_values.append(value)
 
+            cp, thalach, ca, oldpeak, exang, thal = user_values
+            if cp not in (0, 1, 2, 3):
+                raise ValueError("cp must be 0, 1, 2, or 3")
+            if thalach <= 0:
+                raise ValueError("thalach must be greater than 0")
+            if ca not in (0, 1, 2, 3, 4):
+                raise ValueError("ca must be 0, 1, 2, 3, or 4")
+            if oldpeak < 0:
+                raise ValueError("oldpeak cannot be negative")
+            if exang not in (0, 1):
+                raise ValueError("exang must be 0 or 1")
+            if thal not in (0, 1, 2, 3):
+                raise ValueError("thal must be 0, 1, 2, or 3")
+
             x_user = np.array(user_values, dtype=np.float64).reshape(1, -1)
             x_user_norm = ApplyStandardization(x_user, train_mean, train_std)
             prediction = model.predict(x_user_norm)[0, 0]
 
             if prediction == 1:
-                result_text.set_text("Prediction: Heart Disease Risk (1)")
+                result_text.set_text("Model output: class 1 (risk indicator)")
                 result_text.set_color("red")
             else:
-                result_text.set_text("Prediction: Healthy (0)")
+                result_text.set_text("Model output: class 0 (no risk indicator)")
                 result_text.set_color("green")
 
             fig.canvas.draw_idle()
 
-        except ValueError:
-            result_text.set_text("Invalid input! Please enter numeric values.")
+        except ValueError as error:
+            result_text.set_text(f"Invalid input: {error}")
             result_text.set_color("orange")
             fig.canvas.draw_idle()
 

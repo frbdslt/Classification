@@ -51,10 +51,8 @@ class Perceptron:
         z = np.dot(X_b, self.w)
         return self._step_function(z)
 
-    @property
     def bias(self):
         return self.w[0, 0] if self.w is not None else None
 
-    @property
     def weights(self):
         return self.w[1:, :] if self.w is not None else None
