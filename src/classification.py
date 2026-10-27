@@ -26,8 +26,8 @@ class Perceptron:
             total_errors = 0
 
             for i in range(n_samples):
-                xi = X_b[i : i + 1]  # shape: (1, n_features)
-                target = y[i : i + 1]  # shape: (1, 1)
+                xi = X_b[i : i + 1]  
+                target = y[i : i + 1]  
 
                 z = np.dot(xi, self.w)
                 y_pred = self._step_function(z)
@@ -40,7 +40,6 @@ class Perceptron:
 
             self.errors_history.append(total_errors)
 
-            # Early stopping if completely converged
             if total_errors == 0:
                 break
 
